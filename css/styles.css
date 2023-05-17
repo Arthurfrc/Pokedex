@@ -53,6 +53,7 @@ main .listagem-pokemon {
 main .card-pokemon {
     background-color: #D8E3EC;
     width: 200px;
+    height : 342px;
     padding: 15px;
     display: flex;
     flex-direction: column;
@@ -84,9 +85,7 @@ main .card-pokemon .informations span{
 }
 
 main .card-pokemon .gif {
-    width: 90px;
-    heigth: 90px;
-
+    height: 90px;
 }
 
 main .card-pokemon .types {
