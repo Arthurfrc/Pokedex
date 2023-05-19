@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+//Tipos únicos existentes nos Pokémons
+model Type {
+  id                String            @id @default(uuid())
+  title             String
+  weakOffensive1    WeakOffensive[]   @relation("weakOffense1")
+  weakOffensive2    WeakOffensive[]   @relation("weakOffense2")
+  StrongOffensive1  StrongOffensive[] @relation("strongOffense1")
+  StrongOffensive2  StrongOffensive[] @relation("strongOffense2")
+  ResistsOffensive1 Resists[]         @relation("resistsOffensive1")
+  ResistsOffensive2 Resists[]         @relation("resistsOffensive2")
+  WeakDefensive1    WeakDeffensive[]  @relation("weakDeffensive1")
+  WeakDefensive2    WeakDeffensive[]  @relation("weakDeffensive2")
+  Pokemon1          Pokemon[]         @relation("pokemonType1")
+  Pokemon2          Pokemon[]         @relation("pokemonType2")
+
+  @@map("types")
+}
+
+model WeakOffensive {
+  id    String @id @default(uuid())
+  type1 String
+  type2 String
+  value Int
+
+  type1Ref Type @relation("weakOffense1", fields: [type1], references: [id])
+  type2Ref Type @relation("weakOffense2", fields: [type2], references: [id])
+
+  //ataque do type1 é fraco contra o pokemon do type2
+
+  @@map("weakOffensive")
+}
+
+model StrongOffensive {
+  id    String @id @default(uuid())
+  type1 String
+  type2 String
+  value Int
+
+  type1Ref Type @relation("strongOffense1", fields: [type1], references: [id])
+  type2Ref Type @relation("strongOffense2", fields: [type2], references: [id])
+
+  //ataque do type1 é forte contra o pokemon do type2
+
+  @@map("strongOffensive")
+}
+
+model Resists {
+  id    String @id @default(uuid())
+  type1 String
+  type2 String
+  value Int
+
+  type1Ref Type @relation("resistsOffensive1", fields: [type1], references: [id])
+  type2Ref Type @relation("resistsOffensive2", fields: [type2], references: [id])
+
+  //defesa do pokemon type1 é forte contra o ataque do type2
+
+  @@map("resists")
+}
+
+model WeakDeffensive {
+  id    String @id @default(uuid())
+  type1 String
+  type2 String
+  value Int
+
+  type1Ref Type @relation("weakDeffensive1", fields: [type1], references: [id])
+  type2Ref Type @relation("weakDeffensive2", fields: [type2], references: [id])
+
+  //defesa do pokemon type1 é fraca contra o ataque do type2
+
+  @@map("weakDeffensive")
+}
+
+model Pokemon {
+  id         String  @id @default(uuid())
+  name       String
+  Form       String?
+  Type1      String
+  Type2      String?
+  Total      Int
+  HP         Int
+  ATK        Int
+  DEF        Int
+  SpA        Int
+  SpD        Int
+  Spe        Int
+  Generation Int
+  Image      String?
+  type1Ref   Type    @relation("pokemonType1", fields: [Type1], references: [id])
+  type2Ref   Type?   @relation("pokemonType2", fields: [Type2], references: [id])
+}
