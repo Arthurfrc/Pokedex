@@ -1,0 +1,37 @@
+Crie uma pasta chamada "Projeto" e atualize o ".git" para receber um projeto em **React Native com TypeScript** com as seguintes características:
+
+### 📁 Estrutura geral
+- Estrutura modular por pastas (components, screens, context, assets, navigation, types, data)
+- Navegação usando **React Navigation** com:
+  - Drawer (menu lateral)
+  - Stack (para detalhes dos itens)
+- Uso da biblioteca **React Native Paper** para UI com tema escuro ativado
+
+### 📄 Telas principais:
+1. `MovesScreen` – listagem de todos os movimentos
+2. `MoveDetailsScreen` – detalhes do movimento clicado
+3. `TeamBuilderScreen` – onde o usuário pode montar um time de até 6 pokémons
+4. `TypeCoverageScreen` – exibe os tipos cobertos pelos pokémons escolhidos
+
+### 🎮 Context API:
+- `TeamContext` para armazenar o time montado globalmente
+
+### 📦 Assets:
+Crie a pasta `assets/` com subpastas (os arquivos serão adicionados depois):
+- `attacktypes/`: ícones `.svg` para Physical, Special, Status
+- `forms/`: `.svg` e `.png` com formas como alola, hisui, gigantamax, etc
+- `items/`: com subpastas `evolution`, `mega-stones`, `plates`, `tms`, todas com `.png`
+- `pokemons/`: pokémons com variantes como `-shiny`, `-hisui`, `-paldea`, etc
+- `pokemontypes/`: ícones `.svg` com os tipos (bug, dark, fairy, fire, etc)
+- `trainers/`: reservado para treinadores
+
+### 📑 Tipagens e mocks:
+- Crie interfaces para `Pokemon` e `Move` em `types/`
+- Adicione um mock com 2 ou 3 moves em `data/movesMock.ts` como exemplo
+
+### ✍️ Requisitos adicionais:
+- Documentação com **comentários JSDoc**
+- Separação clara dos componentes
+- Responsivo e preparado para assets SVG com `react-native-svg`
+
+No final, mostre a **estrutura completa das pastas/arquivos** e adicione comentários no código indicando os pontos onde os assets devem ser usados (ex: exibir ícone do tipo, exibir ícone da forma, etc).
