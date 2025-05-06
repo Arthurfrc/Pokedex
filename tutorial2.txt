@@ -1,0 +1,92 @@
+🏁 Tela Inicial
+
+A tela inicial será a primeira exibida quando o app for aberto, contendo duas opções principais:
+HomeScreen.tsx
+
+    Mostra dois botões:
+
+        Montar Time
+
+        Visualizar Pokédex
+
+Esses botões redirecionam o usuário para as telas TeamBuilderScreen e MovesScreen, respectivamente, usando a navegação Stack + Drawer.
+✅ Comportamento esperado:
+
+    O app inicia em HomeScreen
+
+    O usuário escolhe entre montar seu time ou ver movimentos/pokémons
+
+    Navegação lateral (Drawer) permite acessar as outras telas a qualquer momento
+
+✨ Recursos adicionais já integrados:
+
+    React Native Paper com tema escuro habilitado globalmente
+
+    Navegação integrada (Drawer + Stack)
+
+    Contexto compartilhado para equipe (TeamContext)
+
+    Tipagens de dados
+
+    Mock de movimentos
+
+    Estrutura clara e modular
+
+    Suporte a SVGs com react-native-svg
+
+📁 Estrutura final de pastas/arquivos
+    Projeto/
+├── assets/
+│   ├── attacktypes/            # Ícones .svg para tipos de ataque (Physical, Special, Status)
+│   ├── forms/                  # Formas alternativas (alola, hisui, gigantamax) - .svg/.png
+│   ├── items/
+│   │   ├── evolution/          # Itens de evolução (.png)
+│   │   ├── mega-stones/        # Mega Stones (.png)
+│   │   ├── plates/             # Plates (.png)
+│   │   └── tms/                # TMs (.png)
+│   ├── pokemons/               # Sprites de pokémons, variantes (-shiny, -hisui, -paldea, etc)
+│   ├── pokemontypes/           # Ícones .svg para tipos Pokémon (fire, water, etc)
+│   └── trainers/               # Imagens de treinadores
+│
+├── components/
+│   └── MoveCard.tsx            # Exibe dados de um movimento individual
+│
+├── context/
+│   └── TeamContext.tsx         # Contexto global para gerenciamento da equipe
+│
+├── data/
+│   └── movesMock.ts            # Mock com alguns movimentos de exemplo
+│
+├── navigation/
+│   ├── AppNavigator.tsx        # Combina Stack + Drawer
+│   ├── DrawerNavigator.tsx     # Menu lateral com as opções
+│   └── StackNavigator.tsx      # Navegação entre telas
+│
+├── screens/
+│   ├── HomeScreen.tsx          # Tela inicial com as opções
+│   ├── MovesScreen.tsx         # Lista de movimentos
+│   ├── MoveDetailsScreen.tsx   # Detalhes de um movimento
+│   ├── TeamBuilderScreen.tsx   # Montagem do time
+│   └── TypeCoverageScreen.tsx  # Exibe tipos cobertos pelos pokémons escolhidos
+│
+├── types/
+│   ├── Pokemon.ts              # Interface do Pokémon
+│   └── Move.ts                 # Interface do Movimento
+│
+├── App.tsx                     # Componente principal com tema e providers
+├── theme.ts                    # Tema escuro personalizado para Paper
+├── tsconfig.json
+├── .gitignore
+└── package.json
+
+Nos componentes como MoveCard, adicione comentários indicando onde usar:
+{/* Exibir ícone do tipo do ataque (ex: pokemontypes/fire.svg) */}
+
+No TeamBuilderScreen, inclua:
+{/* Exibir sprite do Pokémon com forma ou variação (ex: pokemons/pikachu-shiny.png) */}
+
+Na MoveDetailsScreen, adicione:
+{/* Exibir ícone do tipo de ataque (ex: attacktypes/physical.svg) */}
+
+Em TypeCoverageScreen, algo como:
+{/* Exibir os tipos cobertos com ícones de pokemontypes/ */}
