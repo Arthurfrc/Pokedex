@@ -10,6 +10,7 @@ import { RootStackParamList } from '@/navigation';
 
 import theme from '@/theme';
 import PokeballSvg from '../../assets/pokeball-rgb.svg';
+import pokemonGifs from '../../assets/PokemonGifs';
 
 async function translateText(text: string): Promise<string> {
     try {
@@ -17,12 +18,12 @@ async function translateText(text: string): Promise<string> {
             `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|pt-BR`
         );
         const json = await res.json();
-        
+
         // Verifica se há algum erro ou limite excedido
         if (json.responseStatus !== 200 || json.responseData.translatedText.includes("MYMEMORY WARNING")) {
             return text; // Retorna o texto original em caso de erro
         }
-        
+
         return json.responseData?.translatedText ?? text;
     } catch {
         return text;
@@ -95,20 +96,20 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
                     // Ordenar por ID para ter ordem da Pokédex
                     setPokemonList(processed.sort((a: Pokemon, b: Pokemon) => a.id - b.id));
                 }
-                
+
                 // Obter descrição e configurar
                 const desc = getDescriptionFromData(data);
                 setDescription(desc);
-                
+
                 // Verificar se a descrição original é em inglês
                 const ptDesc = data.effect_entries.find(
                     (entry) => entry.language.name === 'pt-br'
                 );
-                
+
                 const enDesc = data.effect_entries.find(
                     (entry) => entry.language.name === 'en'
                 );
-                
+
                 // Se já temos em pt-br, não precisamos traduzir
                 if (ptDesc) {
                     setIsTranslated(true);
@@ -149,18 +150,18 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
 
         return ptDesc?.effect || enDesc?.effect || 'Descrição não disponível';
     };
-    
+
     // Função para traduzir a descrição
     const translateDescription = async (text: string) => {
         if (text === 'Descrição não disponível' || !text) return;
-        
+
         // Se já temos uma tradução salva, use-a em vez de chamar a API novamente
         if (translatedDescription) {
             setDescription(translatedDescription);
             setIsTranslated(true);
             return;
         }
-        
+
         setTranslating(true);
         try {
             const translated = await translateText(text);
@@ -176,7 +177,7 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
             setTranslating(false);
         }
     };
-    
+
     // Alternar entre descrição traduzida e original
     const toggleDescription = () => {
         if (isTranslated && originalDescription) {
@@ -200,41 +201,65 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
     const PokemonItem = React.memo(({ item }: { item: Pokemon }) => {
         const [imgLoaded, setImgLoaded] = useState(false);
         const [imgError, setImgError] = useState(false);
-        // Formatar ID como string com zeros à esquerda (ex: 001, 025, 150)
-        const paddedId = String(item.id).padStart(3, '0');
+        const [usePng, setUsePng] = useState(false);
 
-        // URLs para tentar (preferência: GIF animado, fallback: PNG estático)
-        const gifUrl = `https://play.pokemonshowdown.com/sprites/ani/${item.name}.gif`;
-        const pngUrl = `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${paddedId}.png`;
+        // calcula chave de lookup
+        const id4 = String(item.id).padStart(4, '0');
+        const slug = item.name.toLowerCase();
+        const mapKey = `${id4}-${slug}`;
+
+        // Debug: imprime exatamente o que está tentando carregar
+        console.log(
+            `POKÉMON DEBUG: ${item.name} (ID=${item.id})`,
+            `\n- mapKey: ${mapKey}`,
+            `\n- Exists in pokemonGifs: ${pokemonGifs[mapKey] ? 'YES' : 'NO'}`
+        );
+
+        // tenta GIF local
+        const localGif = (pokemonGifs as any)[mapKey];
+        const remoteGif = { uri: `https://play.pokemonshowdown.com/sprites/ani/${slug}.gif` };
+        const gifSource = localGif ?? remoteGif;
+        const pngUrl = `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${id4}.png`;
+        const pngSource = { uri: pngUrl };
+
+        const source = imgError || usePng
+            ? pngSource
+            : gifSource;
 
         return (
             <View style={[styles.pokemonItem, { width: columnWidth - 16 }]}>
                 <View style={styles.imageContainer}>
-                    {/* Mostra o SVG enquanto a imagem não carregou ou teve erro */}
                     {(!imgLoaded || imgError) && (
                         <View style={styles.placeholderContainer}>
                             <PokeballSvg width={40} height={40} />
                         </View>
                     )}
-
-                    {/* A imagem principal */}
                     <ExpoImage
-                        source={{ uri: imgError ? pngUrl : gifUrl }}
+                        source={source}
+                        contentFit="contain"
                         style={[
                             styles.pokemonImage,
-                            // Deixa invisível se estiver ainda carregando
                             !imgLoaded && { opacity: 0 }
                         ]}
                         onLoad={() => setImgLoaded(true)}
                         onError={() => {
                             if (!imgError) {
-                                setImgError(true);  // Tenta PNG após falha do GIF
+                                setImgError(true);
+                                setUsePng(true);
                             }
                         }}
                     />
                 </View>
                 <Text style={styles.pokemonName}>
                     {formatPokemonName(item.name)}
+                </Text>
+                <Text style={styles.debugText}>
+                    {localGif
+                        ? 'LOCAL GIF'
+                        : usePng
+                            ? 'PNG fallback'
+                            : remoteGif.uri
+                    }
                 </Text>
             </View>
         );
@@ -271,8 +296,8 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
                         <View style={styles.descriptionHeader}>
                             <Text style={styles.sectionTitle}>Descrição</Text>
                             {originalDescription && (
-                                <TouchableOpacity 
-                                    onPress={toggleDescription} 
+                                <TouchableOpacity
+                                    onPress={toggleDescription}
                                     disabled={translating}
                                     style={styles.translateButton}
                                 >
@@ -282,7 +307,7 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
                                 </TouchableOpacity>
                             )}
                         </View>
-                        
+
                         {translating ? (
                             <View style={styles.translatingContainer}>
                                 <ActivityIndicator size="small" color={theme.colors.primary} />
