@@ -70,6 +70,27 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
     const [originalDescription, setOriginalDescription] = useState<string>('');
     const [translatedDescription, setTranslatedDescription] = useState<string>('');
 
+    // Função para limpar o nome do Pokémon removendo variações específicas
+    const cleanPokemonName = (name: string): string => {
+        // Casos especiais que queremos manter
+        if (name.endsWith('-gmax') || name.endsWith('-mega')) {
+            return name;
+        }
+        
+        // Caso especial do Nidoran
+        if (name.startsWith('nidoran') && (name.endsWith('-m') || name.endsWith('-f'))) {
+            return name;
+        }
+
+        // Para todos os outros casos, remove tudo após o primeiro hífen
+        const firstHyphenIndex = name.indexOf('-');
+        if (firstHyphenIndex !== -1) {
+            return name.substring(0, firstHyphenIndex);
+        }
+
+        return name;
+    };
+
     useEffect(() => {
         fetch(abilityUrl)
             .then((res) => {
@@ -81,7 +102,7 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
 
                 // Extrair e processar lista de pokémon
                 if (data.pokemon && Array.isArray(data.pokemon)) {
-                    const processed = data.pokemon.map(item => {
+                    const processed = data.pokemon.map((item: { pokemon: { name: string; url: string } }) => {
                         // Extrai o ID da URL (formato: https://pokeapi.co/api/v2/pokemon/25/)
                         const urlParts = item.pokemon.url.split('/');
                         const id = parseInt(urlParts[urlParts.length - 2] || '0');
@@ -93,8 +114,19 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
                         };
                     });
 
+                    // Remover duplicatas baseadas no nome limpo
+                    const uniquePokemon = processed.reduce((acc: Pokemon[], curr: Pokemon) => {
+                        const cleanedName = cleanPokemonName(curr.name);
+                        // Verifica se já existe um Pokémon com o nome limpo
+                        const exists = acc.some(p => cleanPokemonName(p.name) === cleanedName);
+                        if (!exists) {
+                            acc.push(curr);
+                        }
+                        return acc;
+                    }, []);
+
                     // Ordenar por ID para ter ordem da Pokédex
-                    setPokemonList(processed.sort((a: Pokemon, b: Pokemon) => a.id - b.id));
+                    setPokemonList(uniquePokemon.sort((a: Pokemon, b: Pokemon) => a.id - b.id));
                 }
 
                 // Obter descrição e configurar
