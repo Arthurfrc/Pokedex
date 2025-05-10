@@ -6,11 +6,12 @@ import {
     StyleSheet,
     ActivityIndicator,
     TouchableOpacity,
+    TextInput,
 } from 'react-native';
-import { Searchbar } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/navigation';
+
 import theme from '@/theme';
 
 type Ability = {
@@ -72,13 +73,12 @@ export default function AbilitiesScreen({ navigation }: AbilitiesScreenProps) {
 
     return (
         <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-            <Searchbar
+            <TextInput
                 style={styles.searchInput}
                 placeholder="Pesquisar habilidades..."
-                placeholderTextColor={theme.colors.text}
+                placeholderTextColor="#AAAAAA"
                 value={searchText}
                 onChangeText={setSearchText}
-                icon="magnify"
             />
             <FlatList
                 data={filteredAbilities}
@@ -131,12 +131,15 @@ const styles = StyleSheet.create({
     },
     searchInput: {
         height: 40,
+        width: '70%',
+        alignSelf: 'center',
         borderColor: theme.colors.border,
         borderWidth: 1,
-        borderRadius: theme.spacing.sm,
-        marginHorizontal: theme.spacing.md,
+        borderRadius: theme.spacing.lg,
         marginVertical: theme.spacing.sm,
         paddingHorizontal: theme.spacing.md,
-        color: theme.colors.text,
+        color: '#000000',
+        textAlign: 'center',
+        backgroundColor: '#FFFFFF',
     },
 });

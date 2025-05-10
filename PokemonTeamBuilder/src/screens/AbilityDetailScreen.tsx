@@ -70,6 +70,27 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
     const [originalDescription, setOriginalDescription] = useState<string>('');
     const [translatedDescription, setTranslatedDescription] = useState<string>('');
 
+    // Função para limpar o nome do Pokémon removendo variações específicas
+    const cleanPokemonName = (name: string): string => {
+        // Casos especiais que queremos manter
+        if (name.endsWith('-gmax') || name.endsWith('-mega')) {
+            return name;
+        }
+        
+        // Caso especial do Nidoran
+        if (name.startsWith('nidoran') && (name.endsWith('-m') || name.endsWith('-f'))) {
+            return name;
+        }
+
+        // Para todos os outros casos, remove tudo após o primeiro hífen
+        const firstHyphenIndex = name.indexOf('-');
+        if (firstHyphenIndex !== -1) {
+            return name.substring(0, firstHyphenIndex);
+        }
+
+        return name;
+    };
+
     useEffect(() => {
         fetch(abilityUrl)
             .then((res) => {
@@ -81,7 +102,7 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
 
                 // Extrair e processar lista de pokémon
                 if (data.pokemon && Array.isArray(data.pokemon)) {
-                    const processed = data.pokemon.map(item => {
+                    const processed = data.pokemon.map((item: { pokemon: { name: string; url: string } }) => {
                         // Extrai o ID da URL (formato: https://pokeapi.co/api/v2/pokemon/25/)
                         const urlParts = item.pokemon.url.split('/');
                         const id = parseInt(urlParts[urlParts.length - 2] || '0');
@@ -93,8 +114,19 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
                         };
                     });
 
+                    // Remover duplicatas baseadas no nome limpo
+                    const uniquePokemon = processed.reduce((acc: Pokemon[], curr: Pokemon) => {
+                        const cleanedName = cleanPokemonName(curr.name);
+                        // Verifica se já existe um Pokémon com o nome limpo
+                        const exists = acc.some(p => cleanPokemonName(p.name) === cleanedName);
+                        if (!exists) {
+                            acc.push(curr);
+                        }
+                        return acc;
+                    }, []);
+
                     // Ordenar por ID para ter ordem da Pokédex
-                    setPokemonList(processed.sort((a: Pokemon, b: Pokemon) => a.id - b.id));
+                    setPokemonList(uniquePokemon.sort((a: Pokemon, b: Pokemon) => a.id - b.id));
                 }
 
                 // Obter descrição e configurar
@@ -103,11 +135,11 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
 
                 // Verificar se a descrição original é em inglês
                 const ptDesc = data.effect_entries.find(
-                    (entry) => entry.language.name === 'pt-br'
+                    (entry: { language: { name: string } }) => entry.language.name === 'pt-br'
                 );
 
                 const enDesc = data.effect_entries.find(
-                    (entry) => entry.language.name === 'en'
+                    (entry: { language: { name: string } }) => entry.language.name === 'en'
                 );
 
                 // Se já temos em pt-br, não precisamos traduzir
@@ -443,5 +475,10 @@ const styles = StyleSheet.create({
     translatingText: {
         marginLeft: 8,
         color: theme.colors.primary,
+    },
+    debugText: {
+        fontSize: 12,
+        color: 'rgba(0,0,0,0.5)',
+        marginTop: 4,
     },
 });
