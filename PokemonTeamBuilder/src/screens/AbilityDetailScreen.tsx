@@ -135,11 +135,11 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
 
                 // Verificar se a descrição original é em inglês
                 const ptDesc = data.effect_entries.find(
-                    (entry) => entry.language.name === 'pt-br'
+                    (entry: { language: { name: string } }) => entry.language.name === 'pt-br'
                 );
 
                 const enDesc = data.effect_entries.find(
-                    (entry) => entry.language.name === 'en'
+                    (entry: { language: { name: string } }) => entry.language.name === 'en'
                 );
 
                 // Se já temos em pt-br, não precisamos traduzir
@@ -468,5 +468,10 @@ const styles = StyleSheet.create({
     translatingText: {
         marginLeft: 8,
         color: theme.colors.primary,
+    },
+    debugText: {
+        fontSize: 12,
+        color: 'rgba(0,0,0,0.5)',
+        marginTop: 4,
     },
 });
