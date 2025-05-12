@@ -13,40 +13,26 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/navigation';
 import theme from '@/theme';
+import { TypeIcon } from '@/components/TypeIcon';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PokemonList'>;
+
+type PokemonType =
+    | 'Water' | 'Steel' | 'Rock' | 'Psychic' | 'Poison' | 'Normal'
+    | 'Ice' | 'Ground' | 'Grass' | 'Ghost' | 'Flying' | 'Fire'
+    | 'Fairy' | 'Fighting' | 'Electric' | 'Dragon' | 'Dark' | 'Bug';
 
 type Pokemon = {
     id: number;
     name: string;
-    types: string[];
+    types: PokemonType[];
     sprite: string;
 };
 
-type PokemonType = {
-    name: string;
-    color: string;
-};
-
 const POKEMON_TYPES: PokemonType[] = [
-    { name: 'normal', color: '#A8A878' },
-    { name: 'fire', color: '#F08030' },
-    { name: 'water', color: '#6890F0' },
-    { name: 'electric', color: '#F8D030' },
-    { name: 'grass', color: '#78C850' },
-    { name: 'ice', color: '#98D8D8' },
-    { name: 'fighting', color: '#C03028' },
-    { name: 'poison', color: '#A040A0' },
-    { name: 'ground', color: '#E0C068' },
-    { name: 'flying', color: '#A890F0' },
-    { name: 'psychic', color: '#F85888' },
-    { name: 'bug', color: '#A8B820' },
-    { name: 'rock', color: '#B8A038' },
-    { name: 'ghost', color: '#705898' },
-    { name: 'dragon', color: '#7038F8' },
-    { name: 'dark', color: '#705848' },
-    { name: 'steel', color: '#B8B8D0' },
-    { name: 'fairy', color: '#EE99AC' },
+    'Normal', 'Fire', 'Water', 'Electric', 'Grass', 'Ice',
+    'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic',
+    'Bug', 'Rock', 'Ghost', 'Dragon', 'Dark', 'Steel', 'Fairy'
 ];
 
 export default function PokemonListScreen({ navigation }: Props) {
@@ -54,7 +40,7 @@ export default function PokemonListScreen({ navigation }: Props) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [searchText, setSearchText] = useState('');
-    const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+    const [selectedTypes, setSelectedTypes] = useState<PokemonType[]>([]);
 
     useEffect(() => {
         fetchPokemons();
@@ -72,7 +58,9 @@ export default function PokemonListScreen({ navigation }: Props) {
                     return {
                         id: details.id,
                         name: details.name,
-                        types: details.types.map((type: any) => type.type.name),
+                        types: details.types.map((type: any) =>
+                            type.type.name.charAt(0).toUpperCase() + type.type.name.slice(1)
+                        ) as PokemonType[],
                         sprite: details.sprites.front_default,
                     };
                 })
@@ -87,7 +75,7 @@ export default function PokemonListScreen({ navigation }: Props) {
         }
     };
 
-    const toggleType = (type: string) => {
+    const toggleType = (type: PokemonType) => {
         setSelectedTypes(prev =>
             prev.includes(type)
                 ? prev.filter(t => t !== type)
@@ -105,17 +93,19 @@ export default function PokemonListScreen({ navigation }: Props) {
 
     const renderTypeChip = (type: PokemonType) => (
         <TouchableOpacity
-            key={type.name}
+            key={type}
             style={[
                 styles.typeChip,
-                { backgroundColor: type.color },
-                selectedTypes.includes(type.name) && styles.selectedTypeChip
+                selectedTypes.includes(type) && styles.selectedTypeChip
             ]}
-            onPress={() => toggleType(type.name)}
+            onPress={() => toggleType(type)}
         >
-            <Text style={styles.typeChipText}>
-                {type.name.charAt(0).toUpperCase() + type.name.slice(1)}
-            </Text>
+            <View style={[
+                styles.typeIconWrapper,
+                !selectedTypes.includes(type) && styles.unselectedTypeIcon
+            ]}>
+                <TypeIcon type={type} size={28} />
+            </View>
         </TouchableOpacity>
     );
 
@@ -127,16 +117,8 @@ export default function PokemonListScreen({ navigation }: Props) {
             </Text>
             <View style={styles.typeContainer}>
                 {item.types.map(type => (
-                    <View
-                        key={type}
-                        style={[
-                            styles.typeBadge,
-                            { backgroundColor: POKEMON_TYPES.find(t => t.name === type)?.color }
-                        ]}
-                    >
-                        <Text style={styles.typeText}>
-                            {type.charAt(0).toUpperCase() + type.slice(1)}
-                        </Text>
+                    <View key={type}>
+                        <TypeIcon type={type} size={24} />
                     </View>
                 ))}
             </View>
@@ -161,24 +143,23 @@ export default function PokemonListScreen({ navigation }: Props) {
 
     return (
         <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-            <View style={styles.searchContainer}>
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Buscar por nome ou número..."
-                    placeholderTextColor="#666"
-                    value={searchText}
-                    onChangeText={setSearchText}
-                />
-            </View>
+            <View style={styles.headerContainer}>
+                <View style={styles.searchContainer}>
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Buscar por nome ou número..."
+                        placeholderTextColor="#666"
+                        value={searchText}
+                        onChangeText={setSearchText}
+                    />
+                </View>
 
-            <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.typesContainer}
-                contentContainerStyle={styles.typesContent}
-            >
-                {POKEMON_TYPES.map(renderTypeChip)}
-            </ScrollView>
+                <View style={styles.typesContainer}>
+                    <View style={styles.typesGrid}>
+                        {POKEMON_TYPES.map(renderTypeChip)}
+                    </View>
+                </View>
+            </View>
 
             <FlatList
                 data={filteredPokemons}
@@ -194,6 +175,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: theme.colors.background,
+    },
+    headerContainer: {
+        backgroundColor: theme.colors.background,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
     },
     centered: {
         flex: 1,
@@ -215,24 +201,32 @@ const styles = StyleSheet.create({
         color: '#000',
     },
     typesContainer: {
-        maxHeight: 50,
+        height: 120,
+        paddingVertical: 8,
     },
-    typesContent: {
-        paddingHorizontal: 16,
+    typesGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        paddingHorizontal: 12,
         gap: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     typeChip: {
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 20,
-        marginRight: 8,
+        padding: 4,
+        height: 32,
+        width: 32,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     selectedTypeChip: {
-        opacity: 0.7,
+        opacity: 1,
     },
-    typeChipText: {
-        color: '#fff',
-        fontWeight: 'bold',
+    typeIconWrapper: {
+        opacity: 1,
+    },
+    unselectedTypeIcon: {
+        opacity: 0.4,
     },
     listContainer: {
         padding: 16,
@@ -249,28 +243,17 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
     },
     pokemonNumber: {
-        color: '#666',
         fontSize: 14,
+        color: '#666',
         marginBottom: 4,
     },
     pokemonName: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#000',
         marginBottom: 8,
     },
     typeContainer: {
         flexDirection: 'row',
         gap: 8,
-    },
-    typeBadge: {
-        paddingHorizontal: 12,
-        paddingVertical: 4,
-        borderRadius: 12,
-    },
-    typeText: {
-        color: '#fff',
-        fontSize: 12,
-        fontWeight: 'bold',
     },
 });
