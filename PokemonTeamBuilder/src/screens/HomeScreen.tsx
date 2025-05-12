@@ -14,7 +14,7 @@ export default function HomeScreen({ navigation }: Props) {
     return (
         <View style={styles.container}>
             <PrimaryButton
-                title="Criar Time Teste"
+                title="Criar Time"
                 onPress={() => navigation.navigate('TeamBuilder')}
             />
             <PrimaryButton
