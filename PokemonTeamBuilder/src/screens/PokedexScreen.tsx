@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation';
-import PrimaryButton from '../components/PrimaryButton';
+import { RootStackParamList } from '@/navigation';
+import PrimaryButton from '@/components/PrimaryButton';
 
 type PokedexNavProp = NativeStackNavigationProp<RootStackParamList, 'Pokedex'>;
 interface Props {

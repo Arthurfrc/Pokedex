@@ -240,13 +240,6 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
         const slug = item.name.toLowerCase();
         const mapKey = `${id4}-${slug}`;
 
-        // Debug: imprime exatamente o que está tentando carregar
-        console.log(
-            `POKÉMON DEBUG: ${item.name} (ID=${item.id})`,
-            `\n- mapKey: ${mapKey}`,
-            `\n- Exists in pokemonGifs: ${pokemonGifs[mapKey] ? 'YES' : 'NO'}`
-        );
-
         // tenta GIF local
         const localGif = (pokemonGifs as any)[mapKey];
         const remoteGif = { uri: `https://play.pokemonshowdown.com/sprites/ani/${slug}.gif` };
@@ -285,7 +278,7 @@ export default function AbilityDetailScreen({ route, navigation }: Props) {
                 <Text style={styles.pokemonName}>
                     {formatPokemonName(item.name)}
                 </Text>
-                <Text style={styles.debugText}>
+                <Text>
                     {localGif
                         ? 'LOCAL GIF'
                         : usePng

@@ -9,6 +9,9 @@ import PokemonListScreen from "@/screens/PokemonListScreen";
 import ItemsScreen from "@/screens/ItemsScreen";
 import AbilitiesScreen from "@/screens/AbilitiesScreen";
 import AbilityDetailScreen from "@/screens/AbilityDetailScreen";
+import EvolveItemsScreen from "@/screens/EvolveItemsScreen";
+import TMsHMsScreen from "@/screens/TMsHMsScreen";
+import MegaStonesScreen from "@/screens/MegaStonesScreen";
 
 import theme from "@/theme";
 
@@ -20,6 +23,9 @@ export type RootStackParamList = {
     Items: undefined;
     Abilities: undefined;
     AbilityDetail: { abilityName: string; abilityUrl: string };
+    EvolveItems: undefined;
+    TMsHMs: undefined;
+    MegaStones: undefined;
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -45,6 +51,9 @@ export default function Navigation() {
             <Stack.Screen name="Items" component={ItemsScreen} />
             <Stack.Screen name="Abilities" component={AbilitiesScreen} />
             <Stack.Screen name="AbilityDetail" component={AbilityDetailScreen} />
+            <Stack.Screen name="EvolveItems" component={EvolveItemsScreen} />
+            <Stack.Screen name="TMsHMs" component={TMsHMsScreen} />
+            <Stack.Screen name="MegaStones" component={MegaStonesScreen} />
         </Stack.Navigator >
     )
 }
